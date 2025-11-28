@@ -1,6 +1,7 @@
 # ☕ CoffeeHouse API
 
-REST API на Python Flask для получения различных данных из базы данных MySQL для [Приложения кофейни](https://github.com/vitakurakina/CoffeeHouse)
+REST API на Python Flask для получения различных данных из базы данных MySQL для [Приложения кофейни](https://github.com/vitakurakina/CoffeeHouse).
+
 В базе данных хранятся данные о меню кофейни: список напитков и десертов. Изображения товаров хранятся в локальной папки.
 
 ---
