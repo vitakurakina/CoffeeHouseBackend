@@ -77,10 +77,10 @@ def login():
         return jsonify({"error": "Неверный email или пароль"}), 401
 
     return jsonify({"message": "Успешный вход",
-        "user_id": user_id,
+        "userId": user_id,
         "login": login,
-        "qr_token": qr_token,
-        "bonus_amount": bonus_amount}), 200
+        "qrToken": qr_token,
+        "bonusAmount": bonus_amount}), 200
 
 @auth_bp.route('/me', methods=['GET'])
 def me():
@@ -116,9 +116,9 @@ def me():
     user_id, login, email, qr_token, bonus_amount = user
 
     return jsonify({
-        "user_id": user_id,
+        "userId": user_id,
         "login": login,
         "email": email,
-        "qr_token": qr_token,
-        "bonus_amount": bonus_amount
+        "qrToken": qr_token,
+        "bonusAmount": bonus_amount
     }), 200

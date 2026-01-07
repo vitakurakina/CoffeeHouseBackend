@@ -7,6 +7,7 @@ from config import db_config
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
 app.register_blueprint(auth_bp)
+# photo_url = "https://192.168.31.8:5000/images/"
 
 IMAGE_FOLDER = os.path.join(os.path.dirname(__file__), "ItemImages")
 
@@ -22,10 +23,10 @@ def get_drinks():
     cursor = con.cursor()
     cursor.execute("""SELECT
         CONCAT(d.name,' ', ds.name) AS name,
-        CONCAT('Цена: ', d.price, '₽') AS price,
-        CONCAT('Описание: ', dsc.text) AS description,
-        CONCAT('Особенности напитка: ', dt.name) AS info,
-        CONCAT('Категория: ', dc.name) AS category,
+        d.price AS price,
+        dsc.text AS description,
+        dt.name AS info,
+        dc.name AS category,
         d.photo AS image
     FROM drinks d
     LEFT JOIN descriptions dsc ON d.id_description = dsc.id_description
@@ -41,7 +42,7 @@ def get_drinks():
         name, price, description, info, category, photo = drink
         if photo:
             photo = photo.strip().strip("'").strip('"')
-            image_url = f"http://192.168.31.8:5000/images/{photo}"
+            image_url = f"http://192.168.1.58:5000/images/{photo}"
         else:
             image_url = ""
         result.append({
@@ -60,9 +61,9 @@ def get_desserts():
     cursor = con.cursor()
     cursor.execute("""SELECT
         d.name AS name,
-        CONCAT('Цена: ', d.price, '₽') AS price,
-        CONCAT('Описание: ', dsc.text) AS description,
-        CONCAT('Категория: ', dc.name) AS category,
+        d.price AS price,
+        dsc.text AS description,
+        dc.name AS category,
         d.photo AS image
     FROM desserts d
     LEFT JOIN descriptions dsc ON d.id_description = dsc.id_description
@@ -76,7 +77,7 @@ def get_desserts():
         name, price, description, category, photo = dessert
         if photo:
             photo = photo.strip().strip("'").strip('"')
-            image_url = f"http://192.168.31.8:5000/images/{photo}"
+            image_url = f"http://192.168.1.58:5000//images/{photo}"
         else:
             image_url = ""
         result.append({
@@ -88,6 +89,37 @@ def get_desserts():
         })
 
     return jsonify(result)
+
+@app.route('/add-bonus', methods=['POST'])
+def add_bonus():
+    data = request.json
+
+    user_id = data.get("userId")
+    total_price = data.get("totalPrice")
+
+    if user_id is None or total_price is None:
+        return jsonify({"error": "Missing data"}), 400
+
+    bonus = int(total_price)  # 10% бонус
+
+    con = mysql.connector.connect(**db_config)
+    cursor = con.cursor()
+
+    cursor.execute("""
+        UPDATE users
+        SET bonus_amount = bonus_amount + %s
+        WHERE id_user = %s
+    """, (bonus, user_id))
+
+    con.commit()
+    cursor.close()
+    con.close()
+
+    return jsonify({
+        "addedBonus": bonus,
+        "totalPrice": total_price
+    })
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
