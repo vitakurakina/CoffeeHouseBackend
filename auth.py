@@ -4,7 +4,7 @@ import mysql.connector
 from config import db_config
 from token_generation import generate_qr_token
 
-auth_bp = Blueprint('auth', __name__)
+auth_bp = Blueprint('auth', __name__, url_prefix='/api')
 
 def get_db():
     return mysql.connector.connect(**db_config)
